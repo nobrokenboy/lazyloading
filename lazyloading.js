@@ -266,9 +266,13 @@ var lazyloading=(function () {
 		
 		//监听滚动条事件
 		_addEventListener(window,'scroll',function(){
-			_self.loading()
+			_self.loading();
 		});
 		
+		//检测窗口大小发生变化时
+		_addEventListener(window,'resize',function(){
+			_self.loading();
+		})
 	};
 	
 	//init
@@ -291,7 +295,7 @@ var lazyloading=(function () {
 			var imgReal=i.getAttribute("data-src");
 			//获取图片的中心点位置
 			var imgCenterH=_getPageTop(i)+i.clientHeight/2;
-			//判断图片所在位置然后进行更新,如果图片本身是在文档流offsetTop都是相对于body
+			//判断图片是否在可视范围内
 			if(imgCenterH<seeHeight+scrollHeight){
 				i.setAttribute("src",imgReal);
 			}
