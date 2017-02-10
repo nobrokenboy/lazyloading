@@ -254,7 +254,7 @@ var lazyloading=(function () {
 			var dataSrc=i.getAttribute("data-img-fake");
 			//先用小点
 			if(dataSrc){
-				i.setAttribute("src",dataSrc)
+				i.setAttribute("src",dataSrc);
 			}else{
 				i.setAttribute("src",_self.settings.loadingImg);
 			}
@@ -283,6 +283,7 @@ var lazyloading=(function () {
 	 };
 	 //loading
 	 lazyloader.prototype.loading=function(){
+	 	this.settings.onLoading.apply(this);
 	 	var _self=this;
 	 	//获取可见区域
 		var seeHeight=document.documentElement.clientHeight;
@@ -293,15 +294,30 @@ var lazyloading=(function () {
 		Array.prototype.slice.call(loadingImgArrs).forEach(function(i,l){
 			//获取真正的图片
 			var imgReal=i.getAttribute("data-src");
-			//获取图片的中心点位置
+			//获取图片的中心点位置,这里借用刘总的思路
 			var imgCenterH=_getPageTop(i)+i.clientHeight/2;
-			//判断图片是否在可视范围内
+			//判断图片是否在可视范围内，同时图片也是加载完成
 			if(imgCenterH<seeHeight+scrollHeight){
+				if(_self.settings.imgDoneLength++<loadingImgArrs.length){
+					_self.settings.imgDoneLength++;
+				}
+				console.log(_self.settings.imgDoneLength);
 				i.setAttribute("src",imgReal);
 			}
 		});
 		
-	 	this.settings.onLoading.apply(this);
+		if(this.settings.imgDoneLength==loadingImgArrs.length){
+			console.log("完毕了");
+			//移除滚动条监听事件以及窗口大小变化的事件
+			_removeEventListener(window,'scroll',function(){
+				_self.loading();
+			});
+			_removeEventListener(window,'resize',function(){
+				_self.loading();
+			});
+			_self.loaded();
+		}
+	 	
 	 	
 	 	
 	 };
