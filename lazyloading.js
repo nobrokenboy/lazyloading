@@ -254,10 +254,20 @@ var lazyloading=(function () {
 			var dataSrc=i.getAttribute("data-img-fake");
 			//先用小点
 			if(dataSrc){
-				i.setAttribute("src",dataSrc);
+				//判断图片是不是img标签
+				if(i instanceof HTMLImageElement){
+					i.setAttribute("src",dataSrc);
+				}else{
+					i.style.backgroundImage="url("+dataSrc+")";
+				}
 			}else{
-				i.setAttribute("src",_self.settings.loadingImg);
+				if(i instanceof HTMLImageElement){
+					i.setAttribute("src",_self.settings.loadingImg);
+				}else{
+					i.style.backgroundImage="url("+_self.settings.loadingImg+")";
+				}
 			}
+			
 			
 			
 		});
@@ -302,7 +312,12 @@ var lazyloading=(function () {
 					_self.settings.imgDoneLength++;
 				}
 				console.log(_self.settings.imgDoneLength);
-				i.setAttribute("src",imgReal);
+				//判断该元素是不是图片
+				if(i instanceof HTMLImageElement){
+					i.setAttribute("src",imgReal);
+				}else{
+					i.style.backgroundImage="url("+imgReal+")";
+				}
 			}
 		});
 		
