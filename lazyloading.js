@@ -267,6 +267,25 @@ var lazyloading=(function () {
 					i.style.backgroundImage="url("+_self.settings.loadingImg+")";
 				}
 			}
+			//先设置图片的加载属性
+			i.setAttribute("isDone",0);
+			
+			//隐藏图片的子元素
+			var child=[];
+			if(i.hasChildNodes()){
+				Array.prototype.forEach.call(i.childNodes,function(j){
+					if(j.nodeName!=="#text"){
+						child.push(j);
+					}
+				});
+			}
+
+			Array.prototype.forEach.call(child,function(k){
+				k.setAttribute("data-display",k.style.display);
+				k.style.display="none";
+			});
+			
+			
 			
 			
 			
@@ -283,6 +302,14 @@ var lazyloading=(function () {
 		_addEventListener(window,'resize',function(){
 			_self.loading();
 		})
+		
+		
+		if(this.settings.imgDoneLength==loadingImgArrs.length){
+			//移除滚动条监听事件以及窗口大小变化的事件
+			_removeEventListener(window,'scroll',_self.loading);
+			_removeEventListener(window,'resize',_self.loading);
+			_self.loaded();
+		}
 	};
 	
 	//init
@@ -301,37 +328,44 @@ var lazyloading=(function () {
 		var scrollHeight=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop;
 		
 		var loadingImgArrs=document.querySelectorAll(this.settings.selector);
-		Array.prototype.slice.call(loadingImgArrs).forEach(function(i,l){
+		Array.prototype.slice.call(loadingImgArrs).forEach(function(i){
 			//获取真正的图片
 			var imgReal=i.getAttribute("data-src");
-			//获取图片的中心点位置,这里借用刘总的思路
+			//获取图片的中心点位置
 			var imgCenterH=_getPageTop(i)+i.clientHeight/2;
+			//child
+			var childs;
 			//判断图片是否在可视范围内，同时图片也是加载完成
 			if(imgCenterH<seeHeight+scrollHeight){
-				if(_self.settings.imgDoneLength++<loadingImgArrs.length){
+				if(i.getAttribute("isDone")==0){
+		
+					//判断该元素是不是图片
+					if(i instanceof HTMLImageElement){
+						i.setAttribute("src",imgReal);
+					}else{
+						i.style.backgroundImage="url("+imgReal+")";
+					}
+					//将子元素显示出来
+					if(i.hasChildNodes()){
+						Array.prototype.forEach.call(i.childNodes,function(j){
+							if(j.nodeName!=="#text"){
+								j.style.display=j.getAttribute("data-display");
+							}
+						});
+					
+					}
+					
+							
+					//标识着该图片加载完成
+					i.setAttribute("isDone",1);
 					_self.settings.imgDoneLength++;
 				}
-				console.log(_self.settings.imgDoneLength);
-				//判断该元素是不是图片
-				if(i instanceof HTMLImageElement){
-					i.setAttribute("src",imgReal);
-				}else{
-					i.style.backgroundImage="url("+imgReal+")";
-				}
+				
+				
 			}
 		});
 		
-		if(this.settings.imgDoneLength==loadingImgArrs.length){
-			console.log("完毕了");
-			//移除滚动条监听事件以及窗口大小变化的事件
-			_removeEventListener(window,'scroll',function(){
-				_self.loading();
-			});
-			_removeEventListener(window,'resize',function(){
-				_self.loading();
-			});
-			_self.loaded();
-		}
+		
 	 	
 	 	
 	 	
