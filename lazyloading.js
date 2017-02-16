@@ -1,5 +1,5 @@
 /*
-*   lazyloadtree 1.0.0
+*   lazyloading 1.0.0
 *   By nobrokenboy
 *   @function: to realize a lazyloader
 * */
@@ -225,6 +225,7 @@ var lazyloading=(function () {
 		this.settings={
 			selector:'',
 			loadingImg:'',
+			ctx:'',
 			imgDoneLength:0,
 			onInit:function(){
 				
@@ -304,12 +305,7 @@ var lazyloading=(function () {
 		})
 		
 		
-		if(this.settings.imgDoneLength==loadingImgArrs.length){
-			//移除滚动条监听事件以及窗口大小变化的事件
-			_removeEventListener(window,'scroll',_self.loading);
-			_removeEventListener(window,'resize',_self.loading);
-			_self.loaded();
-		}
+		
 	};
 	
 	//init
@@ -330,7 +326,7 @@ var lazyloading=(function () {
 		var loadingImgArrs=document.querySelectorAll(this.settings.selector);
 		Array.prototype.slice.call(loadingImgArrs).forEach(function(i){
 			//获取真正的图片
-			var imgReal=i.getAttribute("data-src");
+			var imgReal=_self.settings.ctx+i.getAttribute("data-src");
 			//获取图片的中心点位置
 			var imgCenterH=_getPageTop(i)+i.clientHeight/2;
 			//child
@@ -363,6 +359,13 @@ var lazyloading=(function () {
 				
 				
 			}
+			
+			if(_self.settings.imgDoneLength==loadingImgArrs.length){
+			//移除滚动条监听事件以及窗口大小变化的事件
+			_removeEventListener(window,'scroll',_self.loading);
+			_removeEventListener(window,'resize',_self.loading);
+			_self.loaded();
+		}
 		});
 		
 		
