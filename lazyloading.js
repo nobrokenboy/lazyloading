@@ -382,4 +382,4 @@ var lazyloading=(function () {
 	 	lazyloader:lazyloader
 	 };
 
-})();
+})(lazyloading);
